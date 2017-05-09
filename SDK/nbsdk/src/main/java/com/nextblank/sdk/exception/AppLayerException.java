@@ -4,7 +4,11 @@ public class AppLayerException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public AppLayerException(String msg) {
-        super(msg);
+    public int code;
+    public String message;
+
+    public AppLayerException(Throwable throwable, int code) {
+        super(throwable);
+        this.code = code;
     }
 }
