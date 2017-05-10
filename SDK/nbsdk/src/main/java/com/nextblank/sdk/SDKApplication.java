@@ -4,6 +4,9 @@ import android.app.Application;
 
 import com.nextblank.sdk.tools.Tools;
 
+/**
+ * Application相关初始化工作
+ **/
 public class SDKApplication extends Application {
 
     private static SDKApplication instance;
