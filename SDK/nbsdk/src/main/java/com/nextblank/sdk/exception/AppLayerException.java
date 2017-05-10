@@ -10,5 +10,6 @@ public class AppLayerException extends Exception {
     public AppLayerException(Throwable throwable, int code) {
         super(throwable);
         this.code = code;
+        this.message = throwable.getMessage();
     }
 }
