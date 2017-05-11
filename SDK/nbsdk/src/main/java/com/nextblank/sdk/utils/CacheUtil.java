@@ -34,37 +34,37 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * 缓存相关工具类
  */
-public class CacheUtils {
+public class CacheUtil {
 
     public static final int TIME_HOUR = 60 * 60;
     public static final int TIME_DAY = TIME_HOUR * 24;
     private static final int MAX_SIZE = 1000 * 1000 * 50; // 50 mb
     private static final int MAX_COUNT = Integer.MAX_VALUE; // 不限制存放数据的数量
-    private static Map<String, CacheUtils> mInstanceMap = new HashMap<>();
+    private static Map<String, CacheUtil> mInstanceMap = new HashMap<>();
     private CacheManager mCacheManager;
 
-    public static CacheUtils get(Context ctx) {
-        return get(ctx, "CacheUtils");
+    public static CacheUtil get(Context ctx) {
+        return get(ctx, "CacheUtil");
     }
 
-    public static CacheUtils get(Context ctx, String cacheName) {
+    public static CacheUtil get(Context ctx, String cacheName) {
         File f = new File(ctx.getCacheDir(), cacheName);
         return get(f, MAX_SIZE, MAX_COUNT);
     }
 
-    public static CacheUtils get(File cacheDir) {
+    public static CacheUtil get(File cacheDir) {
         return get(cacheDir, MAX_SIZE, MAX_COUNT);
     }
 
-    public static CacheUtils get(Context ctx, long max_zise, int max_count) {
-        File f = new File(ctx.getCacheDir(), "CacheUtils");
+    public static CacheUtil get(Context ctx, long max_zise, int max_count) {
+        File f = new File(ctx.getCacheDir(), "CacheUtil");
         return get(f, max_zise, max_count);
     }
 
-    public static CacheUtils get(File cacheDir, long max_zise, int max_count) {
-        CacheUtils manager = mInstanceMap.get(cacheDir.getAbsoluteFile() + myPid());
+    public static CacheUtil get(File cacheDir, long max_zise, int max_count) {
+        CacheUtil manager = mInstanceMap.get(cacheDir.getAbsoluteFile() + myPid());
         if (manager == null) {
-            manager = new CacheUtils(cacheDir, max_zise, max_count);
+            manager = new CacheUtil(cacheDir, max_zise, max_count);
             mInstanceMap.put(cacheDir.getAbsolutePath() + myPid(), manager);
         }
         return manager;
@@ -74,7 +74,7 @@ public class CacheUtils {
         return "_" + android.os.Process.myPid();
     }
 
-    private CacheUtils(File cacheDir, long max_size, int max_count) {
+    private CacheUtil(File cacheDir, long max_size, int max_count) {
         if (!cacheDir.exists() && !cacheDir.mkdirs()) {
             throw new RuntimeException("can't make dirs in "
                     + cacheDir.getAbsolutePath());
