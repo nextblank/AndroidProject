@@ -2,6 +2,7 @@ package com.nextblank.sdk;
 
 import android.app.Application;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.nextblank.sdk.tools.Tools;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -18,6 +19,7 @@ public class SDKApplication extends Application {
         instance = this;
         //Application在此初始化
         Tools.init(this);
+        Fresco.initialize(this);
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.
