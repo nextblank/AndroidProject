@@ -1,12 +1,11 @@
 package com.nextblank.sdk.network;
 
-//import com.nextblank.sdk.network.builder.GetBuilder;
-//import com.nextblank.sdk.network.builder.HeadBuilder;
-//import com.nextblank.sdk.network.builder.OtherRequestBuilder;
-//import com.nextblank.sdk.network.builder.PostFileBuilder;
-//import com.nextblank.sdk.network.builder.PostFormBuilder;
-//import com.nextblank.sdk.network.builder.PostStringBuilder;
-
+import com.nextblank.sdk.network.builder.GetBuilder;
+import com.nextblank.sdk.network.builder.HeadBuilder;
+import com.nextblank.sdk.network.builder.OtherRequestBuilder;
+import com.nextblank.sdk.network.builder.PostFileBuilder;
+import com.nextblank.sdk.network.builder.PostFormBuilder;
+import com.nextblank.sdk.network.builder.PostStringBuilder;
 import com.nextblank.sdk.network.callback.Callback;
 import com.nextblank.sdk.network.request.RequestCall;
 import com.nextblank.sdk.network.utils.Platform;
@@ -50,37 +49,37 @@ public class HttpUtil {
         return mOkHttpClient;
     }
 
-//    public static GetBuilder get() {
-//        return new GetBuilder();
-//    }
-//
-//    public static PostStringBuilder postString() {
-//        return new PostStringBuilder();
-//    }
-//
-//    public static PostFileBuilder postFile() {
-//        return new PostFileBuilder();
-//    }
-//
-//    public static PostFormBuilder post() {
-//        return new PostFormBuilder();
-//    }
-//
-//    public static OtherRequestBuilder put() {
-//        return new OtherRequestBuilder(METHOD.PUT);
-//    }
-//
-//    public static HeadBuilder head() {
-//        return new HeadBuilder();
-//    }
-//
-//    public static OtherRequestBuilder delete() {
-//        return new OtherRequestBuilder(METHOD.DELETE);
-//    }
-//
-//    public static OtherRequestBuilder patch() {
-//        return new OtherRequestBuilder(METHOD.PATCH);
-//    }
+    public static GetBuilder get() {
+        return new GetBuilder();
+    }
+
+    public static PostStringBuilder postString() {
+        return new PostStringBuilder();
+    }
+
+    public static PostFileBuilder postFile() {
+        return new PostFileBuilder();
+    }
+
+    public static PostFormBuilder post() {
+        return new PostFormBuilder();
+    }
+
+    public static OtherRequestBuilder put() {
+        return new OtherRequestBuilder(METHOD.PUT);
+    }
+
+    public static HeadBuilder head() {
+        return new HeadBuilder();
+    }
+
+    public static OtherRequestBuilder delete() {
+        return new OtherRequestBuilder(METHOD.DELETE);
+    }
+
+    public static OtherRequestBuilder patch() {
+        return new OtherRequestBuilder(METHOD.PATCH);
+    }
 
     public void execute(final RequestCall requestCall, Callback callback) {
         if (callback == null)
