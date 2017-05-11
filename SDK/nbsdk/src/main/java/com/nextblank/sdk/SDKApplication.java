@@ -19,11 +19,11 @@ public class SDKApplication extends Application {
         instance = this;
         //Application在此初始化
         Tools.init(this);
-        // do this once, for example in your Application class
-        helper = new DaoMaster.DevOpenHelper(this, "notes-db", null);
-        db = helper.getWritableDatabase();
-        daoMaster = new DaoMaster(db);
-        daoSession = daoMaster.newSession();
+//        // do this once, for example in your Application class
+//        helper = new DaoMaster.DevOpenHelper(this, "notes-db", null);
+//        db = helper.getWritableDatabase();
+//        daoMaster = new DaoMaster(db);
+//        daoSession = daoMaster.newSession();
 //        // do this in your activities/fragments to get hold of a DAO
 //        noteDao = daoSession.getNoteDao();
 
