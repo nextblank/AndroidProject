@@ -1,7 +1,7 @@
 package com.nextblank.sdk.network.request;
 
+import com.nextblank.sdk.exception.IllegalArguException;
 import com.nextblank.sdk.network.callback.Callback;
-import com.nextblank.sdk.network.utils.Exceptions;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import okhttp3.Headers;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-public abstract class OkHttpRequest {
+public abstract class HttpRequest {
     protected String url;
     protected Object tag;
     protected Map<String, String> params;
@@ -18,15 +18,15 @@ public abstract class OkHttpRequest {
 
     protected Request.Builder builder = new Request.Builder();
 
-    protected OkHttpRequest(String url, Object tag,
-                            Map<String, String> params, Map<String, String> headers, int id) {
+    protected HttpRequest(String url, Object tag,
+                          Map<String, String> params, Map<String, String> headers, int id) {
         this.url = url;
         this.tag = tag;
         this.params = params;
         this.headers = headers;
         this.id = id;
         if (url == null) {
-            Exceptions.illegalArgument("url can not be null.");
+            throw new IllegalArgumentException("url can not be null.");
         }
         initBuilder();
     }

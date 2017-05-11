@@ -1,11 +1,12 @@
 package com.nextblank.sdk.network;
 
-import com.nextblank.sdk.network.builder.GetBuilder;
-import com.nextblank.sdk.network.builder.HeadBuilder;
-import com.nextblank.sdk.network.builder.OtherRequestBuilder;
-import com.nextblank.sdk.network.builder.PostFileBuilder;
-import com.nextblank.sdk.network.builder.PostFormBuilder;
-import com.nextblank.sdk.network.builder.PostStringBuilder;
+//import com.nextblank.sdk.network.builder.GetBuilder;
+//import com.nextblank.sdk.network.builder.HeadBuilder;
+//import com.nextblank.sdk.network.builder.OtherRequestBuilder;
+//import com.nextblank.sdk.network.builder.PostFileBuilder;
+//import com.nextblank.sdk.network.builder.PostFormBuilder;
+//import com.nextblank.sdk.network.builder.PostStringBuilder;
+
 import com.nextblank.sdk.network.callback.Callback;
 import com.nextblank.sdk.network.request.RequestCall;
 import com.nextblank.sdk.network.utils.Platform;
@@ -49,43 +50,43 @@ public class HttpUtil {
         return mOkHttpClient;
     }
 
-    public static GetBuilder get() {
-        return new GetBuilder();
-    }
-
-    public static PostStringBuilder postString() {
-        return new PostStringBuilder();
-    }
-
-    public static PostFileBuilder postFile() {
-        return new PostFileBuilder();
-    }
-
-    public static PostFormBuilder post() {
-        return new PostFormBuilder();
-    }
-
-    public static OtherRequestBuilder put() {
-        return new OtherRequestBuilder(METHOD.PUT);
-    }
-
-    public static HeadBuilder head() {
-        return new HeadBuilder();
-    }
-
-    public static OtherRequestBuilder delete() {
-        return new OtherRequestBuilder(METHOD.DELETE);
-    }
-
-    public static OtherRequestBuilder patch() {
-        return new OtherRequestBuilder(METHOD.PATCH);
-    }
+//    public static GetBuilder get() {
+//        return new GetBuilder();
+//    }
+//
+//    public static PostStringBuilder postString() {
+//        return new PostStringBuilder();
+//    }
+//
+//    public static PostFileBuilder postFile() {
+//        return new PostFileBuilder();
+//    }
+//
+//    public static PostFormBuilder post() {
+//        return new PostFormBuilder();
+//    }
+//
+//    public static OtherRequestBuilder put() {
+//        return new OtherRequestBuilder(METHOD.PUT);
+//    }
+//
+//    public static HeadBuilder head() {
+//        return new HeadBuilder();
+//    }
+//
+//    public static OtherRequestBuilder delete() {
+//        return new OtherRequestBuilder(METHOD.DELETE);
+//    }
+//
+//    public static OtherRequestBuilder patch() {
+//        return new OtherRequestBuilder(METHOD.PATCH);
+//    }
 
     public void execute(final RequestCall requestCall, Callback callback) {
         if (callback == null)
             callback = Callback.CALLBACK_DEFAULT;
         final Callback finalCallback = callback;
-        final int id = requestCall.getOkHttpRequest().getId();
+        final int id = requestCall.getHttpRequest().getId();
 
         requestCall.getCall().enqueue(new okhttp3.Callback() {
             @Override
@@ -106,7 +107,7 @@ public class HttpUtil {
                         return;
                     }
 
-                    Object o = finalCallback.parseNetworkResponse(response, id);
+                    Object o = finalCallback.parseResponse(response, id);
                     sendSuccessResultCallback(o, finalCallback, id);
                 } catch (Exception e) {
                     sendFailResultCallback(call, e, finalCallback, id);
@@ -127,7 +128,7 @@ public class HttpUtil {
             @Override
             public void run() {
                 callback.onError(call, e, id);
-                callback.onPost(id);
+                callback.onComplete(id);
             }
         });
     }
@@ -137,8 +138,8 @@ public class HttpUtil {
         mPlatform.execute(new Runnable() {
             @Override
             public void run() {
-                callback.onResponse(object, id);
-                callback.onPost(id);
+                callback.onSuccess(object, id);
+                callback.onComplete(id);
             }
         });
     }

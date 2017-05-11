@@ -1,6 +1,6 @@
-package com.zhy.http.okhttp.callback;
+package com.nextblank.sdk.network.callback;
 
-import com.zhy.http.okhttp.OkHttpUtils;
+import com.nextblank.sdk.network.HttpUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,11 +9,7 @@ import java.io.InputStream;
 
 import okhttp3.Response;
 
-/**
- * Created by zhy on 15/12/15.
- */
-public abstract class FileCallBack extends Callback<File>
-{
+public abstract class FileCallBack extends Callback<File> {
     /**
      * 目标文件存储的文件夹路径
      */
@@ -24,52 +20,43 @@ public abstract class FileCallBack extends Callback<File>
     private String destFileName;
 
 
-    public FileCallBack(String destFileDir, String destFileName)
-    {
+    public FileCallBack(String destFileDir, String destFileName) {
         this.destFileDir = destFileDir;
         this.destFileName = destFileName;
     }
 
 
     @Override
-    public File parseNetworkResponse(Response response, int id) throws Exception
-    {
-        return saveFile(response,id);
+    public File parseResponse(Response response, int id) throws Exception {
+        return saveFile(response, id);
     }
 
 
-    public File saveFile(Response response,final int id) throws IOException
-    {
+    public File saveFile(Response response, final int id) throws IOException {
         InputStream is = null;
         byte[] buf = new byte[2048];
         int len = 0;
         FileOutputStream fos = null;
-        try
-        {
+        try {
             is = response.body().byteStream();
             final long total = response.body().contentLength();
 
             long sum = 0;
 
             File dir = new File(destFileDir);
-            if (!dir.exists())
-            {
+            if (!dir.exists()) {
                 dir.mkdirs();
             }
             File file = new File(dir, destFileName);
             fos = new FileOutputStream(file);
-            while ((len = is.read(buf)) != -1)
-            {
+            while ((len = is.read(buf)) != -1) {
                 sum += len;
                 fos.write(buf, 0, len);
                 final long finalSum = sum;
-                OkHttpUtils.getInstance().getDelivery().execute(new Runnable()
-                {
+                HttpUtil.getInstance().getDelivery().execute(new Runnable() {
                     @Override
-                    public void run()
-                    {
-
-                        inProgress(finalSum * 1.0f / total,total,id);
+                    public void run() {
+                        onProgress(finalSum * 1.0f / total, total, id);
                     }
                 });
             }
@@ -77,20 +64,15 @@ public abstract class FileCallBack extends Callback<File>
 
             return file;
 
-        } finally
-        {
-            try
-            {
+        } finally {
+            try {
                 response.body().close();
                 if (is != null) is.close();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
             }
-            try
-            {
+            try {
                 if (fos != null) fos.close();
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
             }
 
         }

@@ -1,37 +1,30 @@
-package com.zhy.http.okhttp.builder;
+package com.nextblank.sdk.network.builder;
 
-import com.zhy.http.okhttp.request.PostFileRequest;
-import com.zhy.http.okhttp.request.RequestCall;
+import com.nextblank.sdk.network.request.PostFileRequest;
+import com.nextblank.sdk.network.request.RequestCall;
 
 import java.io.File;
 
 import okhttp3.MediaType;
 
-/**
- * Created by zhy on 15/12/14.
- */
-public class PostFileBuilder extends OkHttpRequestBuilder<PostFileBuilder>
-{
+public class PostFileBuilder extends HttpRequestBuilder<PostFileBuilder> {
     private File file;
     private MediaType mediaType;
 
 
-    public OkHttpRequestBuilder file(File file)
-    {
+    public HttpRequestBuilder file(File file) {
         this.file = file;
         return this;
     }
 
-    public OkHttpRequestBuilder mediaType(MediaType mediaType)
-    {
+    public HttpRequestBuilder mediaType(MediaType mediaType) {
         this.mediaType = mediaType;
         return this;
     }
 
     @Override
-    public RequestCall build()
-    {
-        return new PostFileRequest(url, tag, params, headers, file, mediaType,id).build();
+    public RequestCall build() {
+        return new PostFileRequest(url, tag, params, headers, file, mediaType, id).build();
     }
 
 

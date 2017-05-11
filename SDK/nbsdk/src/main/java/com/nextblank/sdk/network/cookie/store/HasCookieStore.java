@@ -1,9 +1,6 @@
-package com.zhy.http.okhttp.cookie.store;
+package com.nextblank.sdk.network.cookie.store;
 
-/**
- * Created by zhy on 16/3/10.
- */
-public interface HasCookieStore
-{
+
+public interface HasCookieStore {
     CookieStore getCookieStore();
 }

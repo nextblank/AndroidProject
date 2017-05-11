@@ -1,12 +1,9 @@
-package com.zhy.http.okhttp.builder;
+package com.nextblank.sdk.network.builder;
 
 import java.util.Map;
 
-/**
- * Created by zhy on 16/3/1.
- */
-public interface HasParamsable
-{
-    OkHttpRequestBuilder params(Map<String, String> params);
-    OkHttpRequestBuilder addParams(String key, String val);
+public interface HasParamsable {
+    HttpRequestBuilder params(Map<String, String> params);
+
+    HttpRequestBuilder addParams(String key, String val);
 }

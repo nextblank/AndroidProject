@@ -5,7 +5,7 @@ import com.nextblank.sdk.network.request.RequestCall;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class OkHttpRequestBuilder<T extends OkHttpRequestBuilder> {
+public abstract class HttpRequestBuilder<T extends HttpRequestBuilder> {
     protected String url;
     protected Object tag;
     protected Map<String, String> headers;
