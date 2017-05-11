@@ -6,36 +6,38 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 
+import com.nextblank.sdk.permission.util.PermissionUtil;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.nextblank.sdk.permission.PermissionUtil.getActivity;
+import static com.nextblank.sdk.permission.util.PermissionUtil.getActivity;
 
-public class PermissionGen {
+public class PermissionRequest {
     private String[] mPermissions;
     private int mRequestCode;
     private Object object;
 
-    private PermissionGen(Object object) {
+    private PermissionRequest(Object object) {
         this.object = object;
     }
 
-    public static PermissionGen with(Activity activity) {
-        return new PermissionGen(activity);
+    public static PermissionRequest with(Activity activity) {
+        return new PermissionRequest(activity);
     }
 
-    public static PermissionGen with(Fragment fragment) {
-        return new PermissionGen(fragment);
+    public static PermissionRequest with(Fragment fragment) {
+        return new PermissionRequest(fragment);
     }
 
-    public PermissionGen permissions(String... permissions) {
+    public PermissionRequest permissions(String... permissions) {
         this.mPermissions = permissions;
         return this;
     }
 
-    public PermissionGen addRequestCode(int requestCode) {
+    public PermissionRequest addRequestCode(int requestCode) {
         this.mRequestCode = requestCode;
         return this;
     }

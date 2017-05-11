@@ -1,4 +1,4 @@
-package com.nextblank.sdk.permission;
+package com.nextblank.sdk.permission.util;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

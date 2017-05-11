@@ -1,4 +1,4 @@
-package kr.co.namee.permissiongen;
+package com.nextblank.sdk.permission;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
