@@ -1,4 +1,4 @@
-package com.nextblank.sdk.network;
+package com.nextblank.sdk.domain.model;
 
 public class BaseResponse<T> {
 
