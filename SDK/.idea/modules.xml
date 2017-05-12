@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SDK.iml" filepath="$PROJECT_DIR$/SDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/nbsdk/nbsdk.iml" filepath="$PROJECT_DIR$/nbsdk/nbsdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
     </modules>
   </component>
 </project>
