@@ -27,4 +27,126 @@
 视图动画早于属性动画，视图动画在API 1里面就已经存在，属性动画直到API3.0才出现，视图动画所在的包名为android.view.animation,属性动画为android.animation,可见视图动画只针对view起作用；试图动画中用到的类一般以Animation结尾，而属性动画则以Animator结尾。  
 （1）属性动画比视图动画更强大，不但可以实现缩放、平移等操作，还可以自己定义动画效果，监听动画的过程，在动画过程中或完成后做响应的动作。  
 （2）属性动画不但可以作用于View，还能作用于Object。  
-（3）属性动画利用属性的改变实现动画，而视图动画仅仅改变了view的大小位置，但view真正的属性没有改变。
+（3）属性动画利用属性的改变实现动画，而视图动画仅仅改变了view的大小位置，但view真正的属性没有改变。  
+###Android中有解析xml的几种方式？它们的原理和区别###  
+XML解析主要有三种方式，SAX、DOM、PULL。常规在PC上开发我们使用Dom相对轻松些，但一些性能敏感的数据库或手机上还是主要采用SAX方式，SAX读取是单向的，优点:不占内存空间、解析属性方便，但缺点就是对于套嵌多个分支来说处理不是很方便。而DOM方式会把整个XML文件加载到内存中去，这里提醒大家该方法在查找方面可以和XPath很好的结合如果数据量不是很大推荐使用，而PULL常常用在J2ME对于节点处理比较好，类似SAX方式，同样很节省内存，在J2ME中我们经常使用的KXML库来解析。  
+###Android中的数据存储方式###
+- **SharedPreferences存储数据：**用来存储一些简单配置信息的一种机制，例如：登录用户的用户名与密码。其采用了Map数据结构来存储数据，以键值的方式存储。使用SharedPreferences只能在同一个包内使用，不能在不同的包之间使用。  
+- **文件存储数据：**是一种较常用的方法，与Java中实现I/O的程序是完全一样。
+- **SQLite数据库存储数据：**
+- **ContentProvider存储数据：**可以向其他应用共享其数据。虽然使用其他方法也可以对外共享数据，但数据访问方式会因数据存储的方式而不同，如：采用文件方式对外共享数据，需要进行文件操作读写数据；采用sharedpreferences共享数据，需要使用sharedpreferencesAPI读写数据。而使用ContentProvider共享数据的好处是统一了数据访问方式。
+- **网络存储数据:**与Android网络数据包打交道。  
+Preference，File， DataBase这三种方式分别对应的目录是`/data/data/Package Name/Shared_Pref, /data/data/Package Name/files, /data/data/Package Name/database`。
+###Android中的activity的启动模式###
+在android里，有4种activity的启动模式，分别为：  
+- **standard (默认)：**默认模式，可以不用写配置。在这个模式下，都会默认创建一个新的实例。因此，在这种模式下，可以有多个相同的实例，也允许多个相同Activity叠加。   
+- **singleTop：**可以有多个实例，但是不允许多个相同Activity叠加。即，如果Activity在栈顶的时候，启动相同的Activity，不会创建新的实例，而会调用其onNewIntent方法。  
+- **singleTask：**只有一个实例。在同一个应用程序中启动他的时候，若Activity不存在，则会在当前task创建一个新的实例，若存在，则会把task中在其之上的其它Activity destory掉并调用它的onNewIntent方法。  
+如果是在别的应用程序中启动它，则会新建一个task，并在该task中启动这个Activity，singleTask允许别的Activity与其在一个task中共存，也就是说，如果我在这个singleTask的实例中再打开新的Activity，这个新的Activity还是会在singleTask的实例的task中。  
+- **singleInstance：**只有一个实例，并且这个实例独立运行在一个task中，这个task只有这个实例，不允许有别的Activity存在。  
+**区别**  
+1. 如何决定所属task
+“standard”和”singleTop”的activity的目标task，和收到的Intent的发送者在同一个task内，除非intent包括参数`FLAG_ACTIVITY_NEW_TASK`。  
+如果提供了`FLAG_ACTIVITY_NEW_TASK`参数，会启动到别的task里。
+“singleTask”和”singleInstance”总是把activity作为一个task的根元素，他们不会被启动到一个其他task里。  
+2. 是否允许多个实例
+“standard”和”singleTop”可以被实例化多次，并且存在于不同的task中，且一个task可以包括一个activity的多个实例；    
+“singleTask”和”singleInstance”则限制只生成一个实例，并且是task的根元素。 singleTop要求如果创建intent的时候栈顶已经有要创建的Activity的实例，则将intent发送给该实例，而不发送给新的实例。  
+3. 是否允许其它activity存在于本task内
+“singleInstance”独占一个task，其它activity不能存在那个task里；如果它启动了一个新的activity，不管新的activity的launch mode如何，新的activity都将会到别的task里运行（如同加了`FLAG_ACTIVITY_NEW_TASK`参数）。  
+而另外三种模式，则可以和其它activity共存。  
+4. 是否每次都生成新实例  
+“standard”对于没一个启动Intent都会生成一个activity的新实例；  
+“singleTop”的activity如果在task的栈顶的话，则不生成新的该activity的实例，直接使用栈顶的实例，否则，生成该activity的实例。  
+比如现在task栈元素为A-B-C-D（D在栈顶），这时候给D发一个启动intent，如果D是 “standard”的，则生成D的一个新实例，栈变为A－B－C－D－D。
+如果D是singleTop的话，则不会生产D的新实例，栈状态仍为A-B-C-D  
+如果这时候给B发Intent的话，不管B的launchmode是”standard” 还是 “singleTop” ，都会生成B的新实例，栈状态变为A-B-C-D-B。
+“singleInstance”是其所在栈的唯一activity，它会每次都被重用。  
+“singleTask”如果在栈顶，则接受intent，否则，该intent会被丢弃，但是该task仍会回到前台。  
+当已经存在的activity实例处理新的intent时候，会调用onNewIntent()方法 如果收到intent生成一个activity实例，那么用户可以通过back键回到上一个状态；如果是已经存在的一个activity来处理这个intent的话，用户不能通过按back键返回到这之前的状态。
+###跟activity和Task有关的Intent启动方式有哪些？其含义？###
+核心的Intent Flag有：  
+- **`FLAG_ACTIVITY_NEW_TASK`**  
+- **`FLAG_ACTIVITY_CLEAR_TOP`**  
+- **`FLAG_ACTIVITY_RESET_TASK_IF_NEEDED`**  
+- **`FLAG_ACTIVITY_SINGLE_TOP`**  
+
+    FLAG_ACTIVITY_NEW_TASK
+ 如果设置，这个Activity会成为历史stack中一个新Task的开始。一个Task（从启动它的Activity到下一个Task中的Activity）定义了用户可以迁移的Activity原子组。Task可以移动到前台和后台；在某个特定Task中的所有Activity总是保持相同的次序。  
+  这个标志一般用于呈现“启动”类型的行为：它们提供用户一系列可以单独完成的事情，与启动它们的Activity完全无关。
+使用这个标志，如果正在启动的Activity的Task已经在运行的话，那么，新的Activity将不会启动；代替的，当前Task会简单的移入前台。参考`FLAG_ACTIVITY_MULTIPLE_TASK`标志，可以禁用这一行为。  
+  这个标志不能用于调用方对已经启动的Activity请求结果。  
+
+    FLAG_ACTIVITY_CLEAR_TOP
+  如果设置，并且这个Activity已经在当前的Task中运行，因此，不再是重新启动一个这个Activity的实例，而是在这个Activity上方的所有Activity都将关闭，然后这个Intent会作为一个新的Intent投递到老的Activity（现在位于顶端）中。  
+  例如，假设一个Task中包含这些Activity：A，B，C，D。如果D调用了startActivity()，并且包含一个指向Activity B的Intent，那么，C和D都将结束，然后B接收到这个Intent，因此，目前stack的状况是：A，B。  
+  上例中正在运行的Activity B既可以在onNewIntent()中接收到这个新的Intent，也可以把自己关闭然后重新启动来接收这个Intent。如果它的启动模式声明为 “multiple”(默认值)，并且你没有在这个Intent中设置`FLAG_ACTIVITY_SINGLE_TOP`标志，那么它将关闭然后重新创建；对于其它的启动模式，或者在这个Intent中设置`FLAG_ACTIVITY_SINGLE_TOP`标志，都将把这个Intent投递到当前这个实例的onNewIntent()中。  
+  这个启动模式还可以与`FLAG_ACTIVITY_NEW_TASK`结合起来使用：用于启动一个Task中的根Activity，它会把那个Task中任何运行的实例带入前台，然后清除它直到根Activity。这非常有用，例如，当从Notification Manager处启动一个Activity。  
+
+    FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+如果设置这个标志，这个activity不管是从一个新的栈启动还是从已有栈推到栈顶，它都将以the front door of the task的方式启动。这就将导致任何与应用相关的栈都将重置到正常状态（不管是正在讲activity移入还是移除），如果需要，或者直接重置该栈为初始状态。  
+
+    FLAG_ACTIVITY_SINGLE_TOP
+  如果设置，当这个Activity位于历史stack的顶端运行时，不再启动一个新的。  
+
+    FLAG_ACTIVITY_BROUGHT_TO_FRONT
+  这个标志一般不是由程序代码设置的，如在launchMode中设置singleTask模式时系统帮你设定。  
+
+    FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET
+  如果设置，这将在Task的Activity stack中设置一个还原点，当Task恢复时，需要清理Activity。也就是说，下一次Task带着`FLAG_ACTIVITY_RESET_TASK_IF_NEEDED`标记进入前台时（典型的操作是用户在主画面重启它），这个Activity和它之上的都将关闭，以至于用户不能再返回到它们，但是可以回到之前的Activity。
+  这在你的程序有分割点的时候很有用。例如，一个e-mail应用程序可能有一个操作是查看一个附件，需要启动图片浏览Activity来显示。这个Activity应该作为e-mail应用程序Task的一部分，因为这是用户在这个Task中触发的操作。然而，当用户离开这个Task，然后从主画面选择e-mail app，我们可能希望回到查看的会话中，但不是查看图片附件，因为这让人困惑。通过在启动图片浏览时设定这个标志，浏览及其它启动的Activity在下次用户返回到mail程序时都将全部清除。  
+
+    FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+  如果设置，新的Activity不会在最近启动的Activity的列表中保存。  
+
+    FLAG_ACTIVITY_FORWARD_RESULT
+  如果设置，并且这个Intent用于从一个存在的Activity启动一个新的Activity，那么，这个作为答复目标的Activity将会传到这个新的Activity中。这种方式下，新的Activity可以调用setResult(int)，并且这个结果值将发送给那个作为答复目标的 Activity。  
+
+    FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
+  这个标志一般不由应用程序代码设置，如果这个Activity是从历史记录里启动的（常按HOME键），那么，系统会帮你设定。  
+
+    FLAG_ACTIVITY_MULTIPLE_TASK
+  不要使用这个标志，除非你自己实现了应用程序启动器。与`FLAG_ACTIVITY_NEW_TASK`结合起来使用，可以禁用把已存的Task送入前台的行为。当设置时，新的Task总是会启动来处理Intent，而不管这是是否已经有一个Task可以处理相同的事情。  
+  由于默认的系统不包含图形Task管理功能，因此，你不应该使用这个标志，除非你提供给用户一种方式可以返回到已经启动的Task。  
+  如果F`LAG_ACTIVITY_NEW_TASK`标志没有设置，这个标志被忽略。  
+
+    FLAG_ACTIVITY_NO_ANIMATION
+  如果在Intent中设置，并传递给`Context.startActivity()`的话，这个标志将阻止系统进入下一个Activity时应用 Acitivity迁移动画。这并不意味着动画将永不运行——如果另一个Activity在启动显示之前，没有指定这个标志，那么，动画将被应用。这个标志可以很好的用于执行一连串的操作，而动画被看作是更高一级的事件的驱动。  
+
+    FLAG_ACTIVITY_NO_HISTORY
+  如果设置，新的Activity将不再历史stack中保留。用户一离开它，这个Activity就关闭了。这也可以通过设置noHistory特性。  
+
+    FLAG_ACTIVITY_NO_USER_ACTION
+  如果设置，作为新启动的Activity进入前台时，这个标志将在Activity暂停之前阻止从最前方的Activity回调的onUserLeaveHint()。  
+  典型的，一个Activity可以依赖这个回调指明显式的用户动作引起的Activity移出后台。这个回调在Activity的生命周期中标记一个合适的点，并关闭一些Notification。
+  如果一个Activity通过非用户驱动的事件，如来电或闹钟，启动的，这个标志也应该传递给Context.startActivity，保证暂停的Activity不认为用户已经知晓其Notification。  
+
+    FLAG_ACTIVITY_PREVIOUS_IS_TOP
+  如果给Intent对象设置了这个标记，并且这个Intent对象被用于从一个既存的Activity中启动一个新的Activity，这个Activity不能用于接受发送给顶层Activity的新的Intent对象，通常认为使用这个标记启动的Activity会被自己立即终止。 
+
+    FLAG_ACTIVITY_REORDER_TO_FRONT
+  如果在Intent中设置，并传递给Context.startActivity()，这个标志将引发已经运行的Activity移动到历史stack的顶端。  
+  例如，假设一个Task由四个Activity组成：A,B,C,D。如果D调用startActivity()来启动Activity B，那么，B会移动到历史stack的顶端，现在的次序变成A,C,D,B。如果`FLAG_ACTIVITY_CLEAR_TOP`标志也设置的话，那么这个标志将被忽略。
+###Activity的生命周期###
+onCreate()、onStart()、onReStart()、onResume()、onPause()、onStop()、onDestory()；  
+可见生命周期：从onStart()直到系统调用onStop()  
+前台生命周期：从onResume()直到系统调用onPause()
+###Activity在屏幕旋转时的生命周期###
+不设置Activity的android:configChanges时，切屏会重新调用各个生命周期，切横屏时会执行一次，切竖屏时会执行两次；  
+设置Activity的android:configChanges="orientation"时，切屏还是会重新调用各个生命周期，切横、竖屏时只会执行一次；  
+设置Activity的android:configChanges="orientation|keyboardHidden"时，切屏不会重新调用各个生命周期，只会执行onConfigurationChanged方法
+###Service的启用和停用###
+第一步：继承Service类
+public class SMSService extends Service {}  
+第二步：在AndroidManifest.xml文件中的<application>节点里对服务进行配置:<service android:name=".SMSService" />  
+服务不能自己运行，需要通过调用Context.startService()或Context.bindService()方法启动服务。这两个方法都可以启动Service，但是它们的使用场合有所不同。使用startService()方法启用服务，调用者与服务之间没有关连，即使调用者退出了，服务仍然运行。使用bindService()方法启用服务，调用者与服务绑定在了一起，调用者一旦退出，服务也就终止，大有“不求同时生，必须同时死”的特点。  
+如果打算采用Context.startService()方法启动服务，在服务未被创建时，系统会先调用服务的onCreate()方法，接着调用onStart()方法。如果调用startService()方法前服务已经被创建，多次调用startService()方法并不会导致多次创建服务，但会导致多次调用onStart()方法。采用startService()方法启动的服务，只能调用Context.stopService()方法结束服务，服务结束时会调用onDestroy()方法。  
+如果打算采用Context.bindService()方法启动服务，在服务未被创建时，系统会先调用服务的onCreate()方法，接着调用onBind()方法。这个时候调用者和服务绑定在一起，调用者退出了，系统就会先调用服务的onUnbind()方法，接着调用onDestroy()方法。如果调用bindService()方法前服务已经被绑定，多次调用bindService()方法并不会导致多次创建服务及绑定(也就是说onCreate()和onBind()方法并不会被多次调用)。如果调用者希望与正在绑定的服务解除绑定，可以调用unbindService()方法，调用该方法也会导致系统调用服务的onUnbind()-->onDestroy()方法。  
+服务常用生命周期回调方法如下：  
+onCreate()该方法在服务被创建时调用，该方法只会被调用一次，无论调用多少次startService()或bindService()方法，服务也只被创建一次。  
+onDestroy()该方法在服务被终止时调用。  
+与采用Context.startService()方法启动服务有关的生命周期方法  
+onStart()只有采用Context.startService()方法启动服务时才会回调该方法。该方法在服务开始运行时被调用。多次调用startService()方法尽管不会多次创建服务，但onStart()方法会被多次调用。  
+与采用Context.bindService()方法启动服务有关的生命周期方法  
+onBind()只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务绑定时被调用，当调用者与服务已经绑定，多次调用    Context.bindService()方法并不会导致该方法被多次调用。  
+onUnbind()只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务解除绑定时被调用
