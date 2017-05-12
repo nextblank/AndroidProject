@@ -150,3 +150,45 @@ onStart()只有采用Context.startService()方法启动服务时才会回调该�
 与采用Context.bindService()方法启动服务有关的生命周期方法  
 onBind()只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务绑定时被调用，当调用者与服务已经绑定，多次调用    Context.bindService()方法并不会导致该方法被多次调用。  
 onUnbind()只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务解除绑定时被调用
+###注册广播的方式和优缺点###
+首先写一个类要继承BroadcastReceiver  
+第一种使用代码进行注册如:  
+
+    IntentFilter filter =  new IntentFilter("android.provider.Telephony.SMS_RECEIVED");  
+    IncomingSMSReceiver receiver = new IncomgSMSReceiver();  
+    registerReceiver(receiver.filter);  
+第二种:在清单文件中声明,添加  
+
+    <receive android:name=".IncomingSMSReceiver " >
+    <intent-filter>
+    <action android:name="android.provider.Telephony.SMS_RECEIVED")
+    <intent-filter>
+    <receiver>  
+两种注册类型的区别是：  
+1)第一种不是常驻型广播，也就是说广播跟随程序的生命周期。  
+2)第二种是常驻型，也就是说当应用程序关闭后，如果有信息广播来，程序也会被系统调用自动运行。
+###在单线程模型中Message、Handler、Message Queue、Looper之间的关系###
+1. Message消息，理解为线程间交流的信息，处理数据后台线程需要更新UI，则发送Message内含一些数据给UI线程。  
+2. Handler处理者，是Message的主要处理者，负责Message的发送，Message内容的执行处理。后台线程就是通过传进来的 Handler对象引用来sendMessage(Message)。而使用Handler，需要implement 该类的 handleMessage(Message)方法，它是处理这些Message的操作内容，例如Update UI。通常需要子类化Handler来实现handleMessage方法。  
+3. Message Queue消息队列，用来存放通过Handler发布的消息，按照先进先出执行。  
+每个message queue都会有一个对应的Handler。Handler会向message queue通过两种方法发送消息：sendMessage或post。这两种消息都会插在message queue队尾并按先进先出执行。但通过这两种方法发送的消息执行的方式略有不同：通过sendMessage发送的是一个message对象,会被 Handler的handleMessage()函数处理；而通过post方法发送的是一个runnable对象，则会自己执行。  
+4. Looper是每条线程里的Message Queue的管家。Android没有Global的Message Queue，而Android会自动替主线程(UI线程)建立Message Queue，但在子线程里并没有建立Message Queue。所以调用Looper.getMainLooper()得到的主线程的Looper不为NULL，但调用Looper.myLooper() 得到当前线程的Looper就有可能为NULL。对于子线程使用Looper，API Doc提供了正确的使用方法：这个Message机制的大概流程：  
+    1. 在Looper.loop()方法运行开始后，循环地按照接收顺序取出Message Queue里面的非NULL的Message。  
+    2. 一开始Message Queue里面的Message都是NULL的。当Handler.sendMessage(Message)到Message Queue，该函数里面设置了那个Message对象的target属性是当前的Handler对象。随后Looper取出了那个Message，则调用 该Message的target指向的Hander的dispatchMessage函数对Message进行处理。在dispatchMessage方法里，如何处理Message则由用户指定，三个判断，优先级从高到低：  1) Message里面的Callback，一个实现了Runnable接口的对象，其中run函数做处理工作；2) Handler里面的mCallback指向的一个实现了Callback接口的对象，由其handleMessage进行处理；3) 处理消息Handler对象对应的类继承并实现了其中handleMessage函数，通过这个实现的handleMessage函数处理消息。由此可见，我们实现的handleMessage方法是优先级最低的！  
+    3. Handler处理完该Message (update UI) 后，Looper则设置该Message为NULL，以便回收！  
+ 在网上有很多文章讲述主线程和其他子线程如何交互，传送信息，最终谁来执行处理信息之类的，个人理解是最简单的方法——判断Handler对象里面的Looper对象是属于哪条线程的，则由该线程来执行1. 当Handler对象的构造函数的参数为空，则为当前所在线程的Looper；2. Looper.getMainLooper()得到的是主线程的Looper对象，Looper.myLooper()得到的是当前线程的Looper对象。
+###简要解释一下Activity、Intent 、Intent filter、Service、Broadcase、BroadcaseReceiver###
+一个activity呈现了一个用户可以操作的可视化用户界面；  
+一个service不包含可见的用户界面，而是在后台运行，可以与一个activity绑定，通过绑定暴露出来接口并与其进行通信；  
+一个broadcast receiver是一个接收广播消息并做出回应的component，broadcast receiver没有界面；  
+一个intent是一个Intent对象，它保存了消息的内容。对于activity和service来说，它指定了请求的操作名称和待操作数据的URI，  Intent对象可以显式的指定一个目标component。如果这样的话，android会找到这个component(基于manifest文件中的声明)并激活它。但如果一个目标不是显式指定的，android必须找到响应intent的最佳component。它是通过将Intent对象和目标的intent filter相比较来完成这一工作的；  
+一个component的intent filter告诉android该component能处理的intent。intent filter也是在manifest文件中声明的。
+###MVC模式的原理和在android中的运用###
+mvc是model,view,controller的缩写，mvc包含三个部分：  
+模型（model）对象：是应用程序的主体部分，所有的业务逻辑都应该写在该层。  
+视图（view）对象：是应用程序中负责生成用户界面的部分。也是在整个mvc架构中用户唯一可以看到的一层，接收用户的输入，显示处理结果。   
+控制器（control）对象：是根据用户的输入，控制用户界面数据显示及更新model对象状态的部分，控制器更重要的一种导航功能，响应用户出发的相关事件，交给m层处理。   
+android鼓励弱耦合和组件的重用，在android中mvc的具体体现如下：   
+1)视图层（view）：一般采用xml文件进行界面的描述，使用的时候可以非常方便的引入，当然，如果你对android了解的比较的多了话，就一定可以想到在android中也可以使用JavaScript+html等的方式作为view层，当然这里需要进行java和javascript之间的通信，幸运的是，android提供了它们之间非常方便的通信实现。  
+2)控制层（controller）：android的控制层的重任通常落在了众多的acitvity的肩上，这句话也就暗含了不要在acitivity中写代码，要通过activity交割model业务逻辑层处理，这样做的另外一个原因是android中的acitivity的响应时间是5s，如果耗时的操作放在这里，程序就很容易被回收掉。   
+3)模型层（model）：对数据库的操作、对网络等的操作都应该在model里面处理，当然对业务计算等操作也是必须放在的该层的。
