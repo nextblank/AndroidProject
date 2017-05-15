@@ -3,6 +3,11 @@
 - **Service：**后台服务于Activity，封装有一个完整的功能逻辑实现，接受上层指令，完成相关的事物，定义好需要接受的Intent提供同步和异步的接口。
 - **Content Provider：**是Android提供的第三方应用数据的访问方案，可以派生Content Provider类，对外提供数据，可以像数据库一样进行选择排序，屏蔽内部数据的存储细节，向外提供统一的借口模型，大大简化上层应用，对数据的整合提供了更方便的途径。
 - **BroadCast Receiver：**接受一种或者多种Intent作触发事件，接受相关消息，做一些简单处理，转换成一条Notification，统一了Android的事件广播模型。
+###ContentProvider是如何实现数据共享的###
+一个程序可以通过实现一个Content provider的抽象接口将自己的数据完全暴露出去，而且Content providers是以类似数据库中表的方式将数据暴露。Content providers存储和检索数据，通过它可以让所有的应用程序访问到，这也是应用程序之间唯一共享数据的方法。
+要想使应用程序的数据公开化，可通过2种方法：创建一个属于你自己的Content provider或者将你的数据添加到一个已经存在的Content provider中，前提是有相同数据类型并且有写入Content provider的权限。  
+如何通过一套标准及统一的接口获取其他应用程序暴露的数据？  
+Android提供了ContentResolver，外界的程序可以通过ContentResolver接口访问ContentProvider提供的数据。
 ###Android中常用的五种布局###
 - **FrameLayout(框架布局):**所有东西依次都放在左上角，会重叠，这个布局比较简单，只能放一点比较简单的东西。
 - **LinearLayout(线性布局):**每一个LinearLayout里面又可分为垂直布局`android:orientation="vertical"`和水平布局`android:orientation="horizontal"` 。当垂直布局时，每一行就只有一个元素，多个元素依次垂直往下；水平布局时，只有一行，每一个元素依次向右排列。
@@ -135,6 +140,15 @@ onCreate()、onStart()、onReStart()、onResume()、onPause()、onStop()、onDes
 不设置Activity的android:configChanges时，切屏会重新调用各个生命周期，切横屏时会执行一次，切竖屏时会执行两次；  
 设置Activity的android:configChanges="orientation"时，切屏还是会重新调用各个生命周期，切横、竖屏时只会执行一次；  
 设置Activity的android:configChanges="orientation|keyboardHidden"时，切屏不会重新调用各个生命周期，只会执行onConfigurationChanged方法
+###如何退出Activity？如何安全退出已调用多个Activity的Application？###
+对于单一Activity的应用来说，退出很简单，直接finish()即可。当然，也可以用killProcess()和System.exit()这样的方法。  
+对于多个activity  
+1. 记录打开的Activity：每打开一个Activity，就记录下来。在需要退出时，关闭每一个Activity即可。  
+2. 发送特定广播：在需要结束应用时，发送一个特定的广播，每个Activity收到广播后，关闭即可。  
+3. 递归退出：在打开新的Activity时使用startActivityForResult，然后自己加标志，在onActivityResult中处理，递归关闭。为了编程方便，最好定义一个Activity基类，处理这些共通问题。
+###如何将一个Activity设置成窗口的样式###
+<activity>中配置：android :theme="@android:style/Theme.Dialog"  
+另外android:theme="@android:style/Theme.Translucent" 是设置透明
 ###Service的启用和停用###
 第一步：继承Service类
 public class SMSService extends Service {}  
@@ -150,6 +164,27 @@ onStart()只有采用Context.startService()方法启动服务时才会回调该�
 与采用Context.bindService()方法启动服务有关的生命周期方法  
 onBind()只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务绑定时被调用，当调用者与服务已经绑定，多次调用    Context.bindService()方法并不会导致该方法被多次调用。  
 onUnbind()只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务解除绑定时被调用
+###IntentService有何优点###
+IntentService是Service的子类，比普通的Service增加了额外的功能。  
+- **Service本身存在两个问题**  
+Service不会专门启动一条单独的进程，Service与它所在应用位于同一个进程中；
+Service也不是专门一条新线程，因此不应该在Service 中直接处理耗时的任务；  
+- **IntentService特征**  
+会创建独立的worker线程来处理所有的Intent请求；
+会创建独立的worker线程来处理onHandleIntent()方法实现的代码，无需处理多线程问题；
+所有请求处理完成后，IntentService会自动停止，无需调用stopSelf()方法停止Service；
+为Service的onBind()提供默认实现，返回null；
+为Service的onStartCommand提供默认实现，将请求Intent添加到队列中；  
+- **IntentService优点**  
+IntentService使用队列的方式将请求的Intent加入队列，然后开启一个worker thread(线程)来处理队列中的Intent，对于异步的startService请求，IntentService会处理完成一个之后再处理第二个，每一个请求都会在一个单独的worker thread中处理，不会阻塞应用程序的主线程
+###Service和Thread的区别###
+Servie是系统的组件，它由系统进程托管（servicemanager）；它们之间的通信类似于client和server，是一种轻量级的ipc通信，这种通信的载体是binder，它是在linux层交换信息的一种ipc。  
+而thread是由本应用程序托管。  
+1. Thread：Thread是程序执行的最小单元，它是分配CPU的基本单位。可以用Thread来执行一些异步的操作。
+2. Service：Service是android的一种机制，当它运行的时候如果是Local Service，那么对应的Service是运行在主进程的main线程上的。如：onCreate，onStart 这些函数在被系统调用的时候都是在主进程的main线程上运行的。如果是Remote Service，那么对应的Service则是运行在独立进程的main线程上。  
+既然这样，那么我们为什么要用Service呢？其实这跟 android 的系统机制有关，我们先拿Thread来说。Thread的运行是独立于Activity的，也就是说当一个Activity被finish之后，如果你没有主动停止Thread或者Thread里的run方法没有执行完毕的话，Thread也会一直执行。因此这里会出现一个问题：当Activity被finish之后，你不再持有该Thread的引用。另一方面，你没有办法在不同的Activity中对同一Thread进行控制。   
+举个例子：如果你的Thread需要不停地隔一段时间就要连接服务器做某种同步的话，该Thread需要在Activity没有start的时候也在运行。这个时候当你start一个Activity就没有办法在该Activity里面控制之前创建的Thread。因此你便需要创建并启动一个Service ，在Service里面创建、运行并控制该Thread，这样便解决了该问题（因为任何Activity都可以控制同一Service，而系统也只会创建一个对应Service的实例）。 
+因此你可以把Service想象成一种消息服务，而你可以在任何有Context的地方调用Context.startService、Context.stopService、Context.bindService，Context.unbindService，来控制它，你也可以在Service里注册BroadcastReceiver，在其他地方通过发送 broadcast来控制它，当然这些都是Thread做不到的。
 ###注册广播的方式和优缺点###
 首先写一个类要继承BroadcastReceiver  
 第一种使用代码进行注册如:  
@@ -183,7 +218,7 @@ onUnbind()只有采用Context.bindService()方法启动服务时才会回调该�
 一个broadcast receiver是一个接收广播消息并做出回应的component，broadcast receiver没有界面；  
 一个intent是一个Intent对象，它保存了消息的内容。对于activity和service来说，它指定了请求的操作名称和待操作数据的URI，  Intent对象可以显式的指定一个目标component。如果这样的话，android会找到这个component(基于manifest文件中的声明)并激活它。但如果一个目标不是显式指定的，android必须找到响应intent的最佳component。它是通过将Intent对象和目标的intent filter相比较来完成这一工作的；  
 一个component的intent filter告诉android该component能处理的intent。intent filter也是在manifest文件中声明的。
-###MVC模式的原理和在android中的运用###
+###MVC模式的原理和在Android中的运用###
 mvc是model,view,controller的缩写，mvc包含三个部分：  
 模型（model）对象：是应用程序的主体部分，所有的业务逻辑都应该写在该层。  
 视图（view）对象：是应用程序中负责生成用户界面的部分。也是在整个mvc架构中用户唯一可以看到的一层，接收用户的输入，显示处理结果。   
