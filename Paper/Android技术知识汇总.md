@@ -14,6 +14,73 @@ Android提供了ContentResolver，外界的程序可以通过ContentResolver接�
 - **AbsoluteLayout(绝对布局):**用X,Y坐标来指定元素的位置，这种布局方式也比较简单，但是在屏幕旋转时，往往会出问题，而且多个元素的时候，计算比较麻烦。
 - **RelativeLayout(相对布局):**可以理解为某一个元素为参照物，来定位的布局方式。主要属性有：相对于某一个元素`android:layout_below`、`android:layout_toLeftOf`相对于父元素的地方`android:layout_alignParentLeft`、`android:layout_alignParentRigh`。
 - **TableLayout(表格布局):**每一个TableLayout里面有表格行TableRow，TableRow里面可以具体定义每一个元素。每一个布局都有自己适合的方式，这五个布局元素可以相互嵌套应用，做出美观的界面。
+###文字竖排绘制###
+canvas.rotate旋转绘制文字  
+
+    canvas = holder.lockCanvas();  
+    Paint paint = new Paint();  
+    paint.setColor(Color.WHITE);  
+    paint.setTextSize(20);  
+    canvas.drawLine(100, 100, 100, 400, paint);  
+    drawText(canvas,"Hello", 80, 200, paint,-90); 
+###View绘制的过程,draw/onDraw和drawChild###
+- **流程一：mesarue()过程**  
+主要作用：为整个View树计算实际的大小，即设置实际的高(对应属性:mMeasuredHeight)和宽(对应属性:mMeasureWidth)，每个View的控件的实际宽高都是由父视图和本身视图决定的。  
+具体的调用链如下：ViewRoot根对象地属性mView(其类型一般为ViewGroup类型)调用measure()方法去计算View树的大小，回调View/ViewGroup对象的onMeasure()方法，该方法实现的功能如下：
+1. 设置本View视图的最终大小，该功能的实现通过调用setMeasuredDimension()方法去设置实际的高(对应属性：mMeasuredHeight)和宽(对应属性：mMeasureWidth)；
+2. 如果该View对象是个ViewGroup类型，需要重写该onMeasure()方法，对其子视图进行遍历的measure()过程。对每个子视图的measure()过程，是通过调用父类ViewGroup.java类里的measureChildWithMargins()方法去实现，该方法内部只是简单地调用了View对象的measure()方法。(由于measureChildWithMargins()方法只是一个过渡层更简单的做法是直接调用View对象的measure()方法)。整个measure调用流程就是个树形的递归过程。 
+measure函数原型为View.java该函数不能被重载。  
+- **流程二、 layout布局过程：**   
+主要作用 ：为将整个根据子视图的大小以及布局参数将View树放到合适的位置上。具体的调用链如下：host.layout()开始View树的布局，继而回调给View/ViewGroup类中的layout()方法。  
+具体流程如下：  
+1. layout方法会设置该View视图位于父视图的坐标轴，即mLeft，mTop，mLeft，mBottom(调用setFrame()函数去实现)接下来回调onLayout()方法(如果该View是ViewGroup对象，需要实现该方法，对每个子视图进行布局)；
+2. 如果该View是个ViewGroup类型，需要遍历每个子视图chiildView，调用该子视图的layout()方法去设置它的坐标值。layout函数原型位于View.java。
+- **流程三、 draw()绘图过程**   
+由ViewRoot对象的performTraversals()方法调用draw()方法发起绘制该View树，值得注意的是每次发起绘图时，并不会重新绘制每个View树的视图，而只会重新绘制那些“需要重绘”的视图，View类内部变量包含了一个标志位DRAWN，当该视图需要重绘时，就会为该View添加该标志位。调用流程：  
+mView.draw()开始绘制，draw()方法实现的功能如下：
+1. 绘制该View的背景
+2. 为显示渐变框做一些准备操作 
+3. 调用onDraw()方法绘制视图本身(每个View都需要重载该方法，ViewGroup不需要实现该方法)
+4. 调用dispatchDraw()方法绘制子视图(如果该View类型不为ViewGroup，即不包含子视图，不需要重载该方法)。dispatchDraw()方法内部会遍历每个子视图，调用drawChild()去重新回调每个子视图的draw()方法(注意，这个地方“需要重绘”的视图才会调用draw()方法)。值得说明的是，ViewGroup类已经为我们重写了dispatchDraw()的功能实现，应用程序一般不需要重写该方法，但可以重载父类函数实现具体的功能。
+- **invalidate()方法：**  
+说明：请求重绘View树，即draw()过程，假如视图发生大小没有变化就不会调用layout()过程，并且只绘制那些“需要重绘的”
+视图，即谁(View的话，只绘制该View；ViewGroup，则绘制整个ViewGroup)请求invalidate()方法，就绘制该视图。  
+一般引起invalidate()操作的函数如下：  
+1. 直接调用invalidate()方法，请求重新draw()，但只会绘制调用者本身。  
+2. setSelection()方法：请求重新draw()，但只会绘制调用者本身。  
+3. setVisibility()方法：当View可视状态在INVISIBLE转换VISIBLE时，会间接调用invalidate()方法，
+继而绘制该View。当View的可视状态在INVISIBLE/VISIBLE转换为GONE状态时，会间接调用requestLayout()和invalidate方法。
+同时，由于整个个View树大小发生了变化，会请求measure()过程以及draw()过程，同样地，只绘制需要“重新绘制”的视图。
+4. setEnabled()方法：请求重新draw()，但不会重新绘制任何视图包括该调用者本身。
+5. requestLayout()方法：会导致调用measure()过程和layout()过程 。
+说明：只是对View树重新布局layout过程包括measure()和layout()过程，不会调用draw()过程，但不会重新绘制
+任何视图包括该调用者本身。
+- **requestFocus()方法：**  
+说明：请求View树的draw()过程，但只绘制“需要重绘”的视图。
+###Android事件处理机制###
+在ViewGroup中，有下面三个方法：  
+（1）dispatchTouchEvent     该方法用来分发事件，一般不会重写这个方法  
+（2）onInterceptTouchEvent  用来拦截事件  
+（3）onTouchEvent           用来处理事件  
+而View中，只有两个方法，即：  
+（1）dispatchTouchEvent     该方法用来分发事件，一般不会重写这个方法    
+（2）onTouchEvent           用来处理事件  
+正常情况下，android中的事件是必须要经过传递流程然后再经过处理流程的。要记住这个先后的顺序。  
+在传递流程和处理流程中，你都可以修改方法的返回值，来对流程做控制。如下：  
+对于事件的拦截，我们主要重写就是OnInterceptTouchEvent和onTouchEvent方法。两句就可以总结：  
+事件的传递，返回结果为true，表示拦截，不再往下传递，为false，不拦截，继续往下传递。主要针对的就是OnInterceptTouchEvent方法。  
+事件的处理，返回结果为true，表示拦截，不再往上传递（即我处理的很完美，不需要你再来审核我！），返回结果为false（没有成功处理事件），继续向上传递。
+###什么是dpi,ps,sp?如何做适配###
+px：是屏幕的像素点  
+dp：一个基于density的抽象单位，如果一个160dpi的屏幕，1dp=1px  
+dip：等同于dp  
+sp：同dp相似，但还会根据用户的字体大小偏好来缩放(建议使用sp作为文本的单位，其它用dip)  
+通过上面的知识我们可以看到这里只要弄懂px和dp之间的关系就可以了。那么下面重点来看一下他们两之间的关系：  
+针对dip和px的关系，做以下概述：  
+1). px(pixels)像素 ：  
+一个像素通常被视为图像的最小的完整采样，这个用的比较多,特别是web开发,页面基本都是使用像素作为单位的.  
+2). dip或dp (device independent pixels)：  
+设备独立像素—这个和设备硬件有关，一般我们为了支持手机上多种分辨率,如WVGA、HVGA和QVGA,都会使用dip作为长度的单位
 ###Android中的动画种类有哪些？它们的特点和区别###
  android3.0之前，主要包括两种动画方式：补间动画（Tween Animation）和帧动画（Frame Animation或者Drawable Animation），这两种动画统称为view动画，针对视图动画存在的不足，3.0之后google增加了属性动画（Property Animation）。之后动画就被分成了View Animation和Property Animation。  
 - **补间动画（Tween Animation）：**  
@@ -246,6 +313,25 @@ ANR给用户。
 抛出运行时异常时就会导致Force Close，比如空指针、数组越界、类型转换异常等等。  
 捕获：可以通过logcat查看抛出异常的代码出现的位置，然后到程序对应代码中进行修改。   
 避免：编写程序时，要思维缜密，在可能出现异常的地方都作相应的处理，增强程序的健壮性。
+###DDMS和TraceView的区别###
+DDMS是一个程序执行查看器，在里面可以看见线程和堆栈等信息，TraceView是程序性能分析器。
+###Android的IPC（进程间通信）机制###
+IPC是内部进程通信的简称，是共享"命名管道"的资源。Android中的IPC机制是为了让Activity和Service之间可以随时的进行交互，故在Android中该机制，只适用于Activity和Service之间的通信，类似于远程方法调用，类似于C/S模式的访问。通过定义AIDL接口文件来定义IPC接口。Servier端实现IPC接口，Client端调用IPC接口本地代理。
+###AIDL的全称是什么？如何工作？能处理哪些类型的数据？###
+全称是：Android Interface Define Language  
+在Android中, 每个应用程序都可以有自己的进程. 在写UI应用的时候, 经常要用到Service. 在不同的进程中, 怎样传递对象呢?显然, Java中不允许跨进程内存共享. 因此传递对象, 只能把对象拆分成操作系统能理解的简单形式, 以达到跨界对象访问的目的. 在J2EE中,采用RMI的方式, 可以通过序列化传递对象. 在Android中, 则采用AIDL的方式. 理论上AIDL可以传递Bundle,实际上做起来却比较麻烦。  
+AIDL(AndRoid接口描述语言)是一种接口描述语言; 编译器可以通过aidl文件生成一段代码，通过预先定义的接口达到两个进程内部通信进程的目的. 如果需要在一个Activity中, 访问另一个Service中的某个对象, 需要先将对象转化成AIDL可识别的参数(可能是多个参数), 然后使用AIDL来传递这些参数, 在消息的接收端, 使用这些参数组装成自己需要的对象。  
+AIDL的IPC的机制和COM或CORBA类似, 是基于接口的，但它是轻量级的。它使用代理类在客户端和实现层间传递值. 如果要使用AIDL, 需要完成2件事情: 1. 引入AIDL的相关类.2. 调用aidl产生的class.  
+- **AIDL的创建方法:**  
+AIDL语法很简单,可以用来声明一个带一个或多个方法的接口，也可以传递参数和返回值。由于远程调用的需要, 这些参数和返回值并不是任何类型.下面是些AIDL支持的数据类型:  
+1. 不需要import声明的简单Java编程语言类型(int,boolean等)  
+2. String, CharSequence不需要特殊声明  
+3. List, Map和Parcelables类型, 这些类型内所包含的数据成员也只能是简单数据类型, String等其他比支持的类型
+###Java中如何引用本地语言###
+可以用JNI（java native interface java本地接口）接口。
+###NDK是什么###
+NDK是一些列工具的集合，NDK提供了一系列的工具，帮助开发者迅速的开发C/C++的动态库，并能自动将so和java 应用打成apk包。  
+NDK集成了交叉编译器，并提供了相应的mk文件和隔离cpu、平台等的差异，开发人员只需简单的修改mk文件就可以创建出so。
 ###Android源码和系统的架构###
 android系统架构采用了分层架构的思想，从上到下共4层，分别为：应用程序层、应用程序框架层、系统库和android运行时层、Linux内核层。  
 - **应用程序层（Java应用程序）：**
@@ -258,16 +344,6 @@ android系统架构采用了分层架构的思想，从上到下共4层，分别
 - **LINUX内核层：**
   Android核心系统服务依赖于Linux内核，如安全性、内存管理、进程管理、网络协议栈和驱动模型。Linux内核也是作为硬件与软件栈的抽象层。
   驱动：显示驱动、摄像头驱动、键盘驱动、WiFi驱动、Audio驱动、flash内存驱动、Binder（IPC）驱动、电源管理等。
-###AIDL的全称是什么？如何工作？能处理哪些类型的数据？###
-全称是：Android Interface Define Language  
-在Android中, 每个应用程序都可以有自己的进程. 在写UI应用的时候, 经常要用到Service. 在不同的进程中, 怎样传递对象呢?显然, Java中不允许跨进程内存共享. 因此传递对象, 只能把对象拆分成操作系统能理解的简单形式, 以达到跨界对象访问的目的. 在J2EE中,采用RMI的方式, 可以通过序列化传递对象. 在Android中, 则采用AIDL的方式. 理论上AIDL可以传递Bundle,实际上做起来却比较麻烦。  
-AIDL(AndRoid接口描述语言)是一种接口描述语言; 编译器可以通过aidl文件生成一段代码，通过预先定义的接口达到两个进程内部通信进程的目的. 如果需要在一个Activity中, 访问另一个Service中的某个对象, 需要先将对象转化成AIDL可识别的参数(可能是多个参数), 然后使用AIDL来传递这些参数, 在消息的接收端, 使用这些参数组装成自己需要的对象。  
-AIDL的IPC的机制和COM或CORBA类似, 是基于接口的，但它是轻量级的。它使用代理类在客户端和实现层间传递值. 如果要使用AIDL, 需要完成2件事情: 1. 引入AIDL的相关类.2. 调用aidl产生的class.  
-- **AIDL的创建方法:**  
-AIDL语法很简单,可以用来声明一个带一个或多个方法的接口，也可以传递参数和返回值。由于远程调用的需要, 这些参数和返回值并不是任何类型.下面是些AIDL支持的数据类型:  
-1. 不需要import声明的简单Java编程语言类型(int,boolean等)  
-2. String, CharSequence不需要特殊声明  
-3. List, Map和Parcelables类型, 这些类型内所包含的数据成员也只能是简单数据类型, String等其他比支持的类型
 ###Android系统的优势和不足###
 - **Android平台手机5大优势：**  
 **一、开放性**  
