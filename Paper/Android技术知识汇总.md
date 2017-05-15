@@ -469,4 +469,4 @@ Fresco是Facebook推出的开源图片缓存工具，主要特点包括：两个
 3.与Activity/Fragment生命周期一致，支持trimMemory。Glide对每个context都保持一个RequestManager，通过FragmentTransaction保持与Activity/Fragment生命周期一致，并且有对应的trimMemory接口实现可供调用。  
 4.支持okhttp、Volley。Glide默认通过UrlConnection获取数据，可以配合okhttp或是Volley使用。实际 ImageLoader、Picasso 也都支持okhttp、Volley。  
 5.内存友好。Glide的内存缓存有个active的设计，从内存缓存中取数据时，不像一般的实现用get，而是用 remove，再将这个缓存数据放到一个value为软引用的activeResources map中，并计数引用数，在图片加载完成后进行判断，如果引用计数为空则回收掉。内存缓存更小图片，Glide 以url、view_width、view_height、屏幕的分辨率等做为联合key，将处理后的图片缓存在内存缓存中，而不是原始图片以节省大小与Activity/Fragment 生命周期一致，支持trimMemory。图片默认使用默认RGB_565而不是ARGB_888，虽然清晰度差些，但图片更小，也可配置到ARGB_888。  
-6.Glide 可以通过signature或不使用本地缓存支持url过期。
+6.Glide可以通过signature或不使用本地缓存支持url过期。
