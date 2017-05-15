@@ -367,3 +367,100 @@ Android平台提供给第三方开发商一个十分宽泛、自由的环境，�
 在不少手机论坛都会有针对某一型号的子论坛，对一款手机的使用心得交流，并分享软件资源。而对于Android平台手机，由于厂商丰富，产品类型多样，这样使用同一款机型的用户越来越少，缺少统一机型的程序强化。举个稍显不当的例子，现在山寨机泛滥，品种各异，就很少有专门针对某个型号山寨机的讨论和群组，除了哪些功能异常抢眼、颇受追捧的机型以外。  
 **五、过分依赖开发商缺少标准配置**  
 在使用PC端的Windows Xp系统的时候，都会内置微软Windows Media Player这样一个浏览器程序，用户可以选择更多样的播放器，如Realplay或暴风影音等。但入手开始使用默认的程序同样可以应付多样的需要。在 Android平台中，由于其开放性，软件更多依赖第三方厂商，比如Android系统的SDK中就没有内置音乐 播放器，全部依赖第三方开发，缺少了产品的统一性。  
+###主流的三类应用：Native App, Web App, Hybrid App.###
+Native App特点:
+性能好
+完美的用户体验
+开发成本高，无法跨平台
+升级困难(审核),维护成本高
+Web App特点:
+开发成本低,更新快,版本升级容易,自动升级
+跨平台，Write Once , Run Anywhere
+无法调用系统级的API
+临时入口，用户留存度低
+性能差,体验差,设计受限制
+相比Native App，Web App体验中受限于以上5个因素：网络环境，渲染性能，平台特性，受限于浏览器，系统限制。
+Hybrid App特点:
+Native App 和 Web App 折中的方案，保留了 Native App 和 Web App 的优点。
+但是还是性能差。页面渲染效率低，在Webview中绘制界面，实现动画，资源消耗都比较大,受限于技术,网速等因素相同点:
+都采用Web的开发模式，使用JS开发；
+都可以直接在Chrome中调试JS代码；
+都支持跨平台的开发；
+都可以实现hot reload，边更新代码边查看效果；
+不同点:
+学习成本
+1.环境配置：
+ReactNative需要按照文档安装配置很多依赖的工具，相对比较麻烦。 weex安装cli之后就可以使用
+2.vue vs react:上面已经做过对比
+react模板JSX学习使用有一定的成本 vue更接近常用的web开发方式，模板就是普通的html，数据绑定使用mustache风格，样式直接使用css
+社区支持
+Weex开源较晚，互联网上相关资料还比较少，社区规模较小；
+React Native社区则比较活跃，可以参考的项目和资料也比较丰富
+一张图:从渲染时间,内存使用,CPU占用,帧率(图形处理器每秒钟能够刷新几次,高的帧率可以得到更流畅、更逼真的动画。每秒钟帧数 （fps） 愈多，所显示的动作就会愈流畅。)
+###常见的网络通信库优缺点###
+- **Volley**  
+Google提供网络通信库，在2013年Google I/O大会上推出了一个新的网络通信框架  
+- 特点：  
+自动调度网络请求  
+多线程并发网络连接、请求优先级  
+请求Cache和内存管理  
+扩展性强 如：支持自定义重连等  
+支持请求取消  
+强大的Debug、tracing  
+- 缺点：  
+对于大数据量的网络操作糟糕，如：下载文件等  
+它的设计目标就是非常适合去进行数据量不大，但通信频繁的网络操作，如list加载等等  
+- **okhttp**  
+square开源的http协议工具类，Android系统API19以后HttpURLConnection内部实现就是使用了okhttp  
+- 特点：  
+支持Http/2，Http/2主要支持 SPDY( http://zh.wikipedia.org/wiki/SPDY )协议。SPDY协议是Google开发的基于传输控制协议的应用层协议，通过压缩，多路复用(一个 TCP 链接传送网页和图片等资源)和优先级来缩短加载时间。  
+如果Http/2不可用，利用连接池减少请求延迟  
+Gzip压缩  
+Response缓存减少不必要的请求  
+支持请求取消  
+- 缺点：  
+在服务器不支持speedy的情况下没有特别明显的优化  
+- **Retrofit**  
+Square开源RESTFUL API库， Retrofit的跟Volley是一个套路，但解耦的更彻底。同时自己内部对OkHtttp客户端做了封装，用Retrofit+OkHttp基本上已经可以处理任何业务场景了。  
+- 特点：  
+简化了网络请求流程，支持注解请求  
+支持多种Converter、还可以自定义，如：Gson、Jackson、protobuf、xml  
+可以配合RxJava使用  
+- 缺点：  
+看不出缺点  
+- **android-async-http**  
+由于HttpClient在Android API23后就不能使用了，android-async-http内部实现了HttpClient。  
+###常见的图片加载库优缺点###
+- **Fresco**  
+Fresco是Facebook推出的开源图片缓存工具，主要特点包括：两个内存缓存加上Native缓存构成了三级缓存，支持流式，可以类似网页上模糊渐进式显示图片，对多帧动画图片支持更好，如Gif、WebP。它的优点是其他几个框架没有的,或者说是其他几个框架的短板。  
+- 优点:
+ 1. 图片存储在安卓系统的匿名共享内存, 而不是虚拟机的堆内存中, 图片的中间缓冲数据也存放在本地堆内存, 所以, 应用程序有更多的内存使用, 不会因为图片加载而导致oom, 同时也减少垃圾回收器频繁调用回收Bitmap 导致的界面卡顿, 性能更高。
+ 2. 渐进式加载JPEG图片, 支持图片从模糊到清晰加载。
+ 3. 图片可以以任意的中心点显示在ImageView, 而不仅仅是图片的中心。
+ 4. JPEG图片改变大小也是在native进行的, 不是在虚拟机的堆内存, 同样减少OOM。
+ 5. 很好的支持GIF图片的显示。  
+- 缺点:
+ 1. 框架较大, 影响Apk体积
+ 2. 使用较繁琐
+- **ImageLoader**  
+是比较老的框架,是github社区上star最多的一个项目,可以理解为点赞最多滴,应该是最有名的一个国内很多知名软件都用它包括淘宝京东聚划算等等。  
+- 优点：  
+1.支持下载进度监听  
+2.可以在View滚动中暂停图片加载，通过PauseOnScrollListener接口可以在View滚动中暂停图片加载。  
+3.默认实现多种内存缓存算法。这几个图片缓存都可以配置缓存算法，不过 ImageLoader默认实现了较多缓存算法，如Size最大先删除、使用最少先删除、最近最少使用、先进先删除、时间最长先删除等。  
+4.支持本地缓存文件名规则定义
+- **Picasso**    
+- 优点  
+1.自带统计监控功能。支持图片缓存使用的监控，包括缓存命中率、已使用内存大小、节省的流量等。  
+2.支持优先级处理。每次任务调度前会选择优先级高的任务，比如App页面中Banner的优先级高于Icon时就很适用。  
+3.支持延迟到图片尺寸计算完成加载  
+4.支持飞行模式、并发线程数根据网络类型而变。手机切换到飞行模式或网络类型变换时会自动调整线程池最大并发数，比如wifi最大并发为4，4g为3，3g为2。这里Picasso根据网络类型来决定最大并发数，而不是CPU核数。  
+5.“无”本地缓存。“无”本地缓存，不是说没有本地缓存，而是Picasso自己没有实现，交给了Square的另外一个网络库okhttp去实现，这样的好处是可以通过请求Response Header中的Cache-Control及Expired控制图片的过期时间。
+- **Glide**   
+- 优点  
+1.不仅仅可以进行图片缓存还可以缓存媒体文件。Glide不仅是一个图片缓存，它支持Gif、WebP、缩略图。甚至是 Video，所以更该当做一个媒体缓存。  
+2.支持优先级处理。  
+3.与Activity/Fragment生命周期一致，支持trimMemory。Glide对每个context都保持一个RequestManager，通过FragmentTransaction保持与Activity/Fragment生命周期一致，并且有对应的trimMemory接口实现可供调用。  
+4.支持okhttp、Volley。Glide默认通过UrlConnection获取数据，可以配合okhttp或是Volley使用。实际 ImageLoader、Picasso 也都支持okhttp、Volley。  
+5.内存友好。Glide的内存缓存有个active的设计，从内存缓存中取数据时，不像一般的实现用get，而是用 remove，再将这个缓存数据放到一个value为软引用的activeResources map中，并计数引用数，在图片加载完成后进行判断，如果引用计数为空则回收掉。内存缓存更小图片，Glide 以url、view_width、view_height、屏幕的分辨率等做为联合key，将处理后的图片缓存在内存缓存中，而不是原始图片以节省大小与Activity/Fragment 生命周期一致，支持trimMemory。图片默认使用默认RGB_565而不是ARGB_888，虽然清晰度差些，但图片更小，也可配置到ARGB_888。  
+6.Glide 可以通过signature或不使用本地缓存支持url过期。
