@@ -329,6 +329,12 @@ AIDL语法很简单,可以用来声明一个带一个或多个方法的接口，
 3. List, Map和Parcelables类型, 这些类型内所包含的数据成员也只能是简单数据类型, String等其他比支持的类型
 ###Java中如何引用本地语言###
 可以用JNI（java native interface java本地接口）接口。
+###简述Android中JNI的调用过程###
+1)安装和下载Cygwin，下载 Android NDK  
+2)在ndk项目中JNI接口的设计  
+3)使用C/C++实现本地方法    
+4)JNI生成动态链接库.so文件  
+5)将动态链接库复制到java工程，在java工程中调用，运行java工程即可  
 ###NDK是什么###
 NDK是一些列工具的集合，NDK提供了一系列的工具，帮助开发者迅速的开发C/C++的动态库，并能自动将so和java 应用打成apk包。  
 NDK集成了交叉编译器，并提供了相应的mk文件和隔离cpu、平台等的差异，开发人员只需简单的修改mk文件就可以创建出so。
