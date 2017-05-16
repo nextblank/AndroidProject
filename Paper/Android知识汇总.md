@@ -81,6 +81,14 @@ sp：同dp相似，但还会根据用户的字体大小偏好来缩放(建议使
 一个像素通常被视为图像的最小的完整采样，这个用的比较多,特别是web开发,页面基本都是使用像素作为单位的.  
 2). dip或dp (device independent pixels)：  
 设备独立像素—这个和设备硬件有关，一般我们为了支持手机上多种分辨率,如WVGA、HVGA和QVGA,都会使用dip作为长度的单位
+###透明度的十六进制###
+00%=FF（不透明） 5%=F2  10%=E5  15%=D8  20%=CC  25%=BF  30%=B2  35%=A5  40%=99  45%=8c   50%=7F  55%=72   60%=66   65%=59   70%=4c   75%=3F   80%=33   85%=21   90%=19   95%=0c   100%=00（全透明）
+###XML种的特殊转义字符###
+    &lt;     <    小于号
+    &gt;     >    大于号
+    &amp;    &    和
+    &apos;   ’    单引号
+    &quot;   "    双引号
 ###Android中的动画种类有哪些？它们的特点和区别###
  android3.0之前，主要包括两种动画方式：补间动画（Tween Animation）和帧动画（Frame Animation或者Drawable Animation），这两种动画统称为view动画，针对视图动画存在的不足，3.0之后google增加了属性动画（Property Animation）。之后动画就被分成了View Animation和Property Animation。  
 - **补间动画（Tween Animation）：**  
