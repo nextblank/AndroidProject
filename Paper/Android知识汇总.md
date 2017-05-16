@@ -483,6 +483,9 @@ native中，被调用的方法实现
     <p><input type="button" onclick="onAlert()" value="Alert"/>
 
 实现原理就是在页面中触发的方法被webView中设置的WebChromeClient给拦截了，从而执行了WebChromeClient中重写的onXxx()方法，没有执行页面中相应的onXxx()方法，这种方式相对简单，而且安全。
+###URI跳转Native方法###  
+在AndroidManifest.xml中对<activity />标签增加<intent-filter />，通过自定义协议实现。比如：com.baidu://a/b/c。Activity中，可以获取到这个Uri，并分段解析，进而启动不同的Activity，实现从WebApp中跳转到Native App的不同页面。  
+推荐使用JSBridge库
 ###Android的IPC（进程间通信）机制###
 IPC是内部进程通信的简称，是共享"命名管道"的资源。Android中的IPC机制是为了让Activity和Service之间可以随时的进行交互，故在Android中该机制，只适用于Activity和Service之间的通信，类似于远程方法调用，类似于C/S模式的访问。通过定义AIDL接口文件来定义IPC接口。Servier端实现IPC接口，Client端调用IPC接口本地代理。
 ###AIDL的全称是什么？如何工作？能处理哪些类型的数据？###
