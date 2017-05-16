@@ -629,3 +629,94 @@ JDK Version 1.1
     引入反射（仅用于内省）。
 JDK Version 1.0  
 开发代号为Oak（橡树），于1996-01-23发行。  
+###Android每个版本的新特性以及新技术使用###
+    Android 4.0,4.1,4.2,4.3
+        支持OpenGL ES 3.0
+        增强蓝牙连接
+        优化位置和传感器
+        添加转场动画
+        支持Daydream
+        人脸识别解锁
+        Photo Sphere 全景相片
+    Android 4.4
+        支持Android Beam
+        添加打印框架
+        存储访问框架
+        低功耗传感器
+        添加短信提供程序
+        添加全屏沉浸模式
+        添加透明系统 UI 样式
+        添加新的媒体功能
+        RenderScript Compute
+            持续性能提升
+            GPU 加速
+            Android NDK 中的 RenderScript
+        图形
+            GLES2.0 SurfaceFlinge
+            新的硬件合成器支持虚拟显示
+        支持新的连接类型
+            新的蓝牙配置文件
+            红外发射器
+            Wi-Fi TDLS 支持
+        无障碍功能
+        安全增强功能
+        内存使用率分析工具
+            Procstats
+
+    Android 5.0
+        Android Runtime (ART)默认运行平台设置
+        通知
+
+          - Material Design 样式
+          - 声音和振动
+          - 锁定屏幕可见性
+          - 媒体播放
+          - 浮动通知
+
+        引入Material Design设计
+        支持OpenGL ES3.1
+        媒体控件和 RemoteControlClient
+        getRecentTasks()
+        支持Android NDK中的64位
+        只能显示绑定到服务，取消隐藏绑定服务
+        WebView API修改
+        自定义权限唯一性要求
+        TLS/SSL 默认配置变更
+
+          - 服务器不支持任何已启用的加密套件
+          - 应用对用于连接服务器的加密套件做出错误的假设
+          - 服务器不支持 TLSv1.1、TLSv1.2 或新的 TLS 扩展
+
+        支持托管配置文件
+
+    Android 6.0
+        运行时请求权限
+        低电耗模式和应用待机模式
+        取消支持 Apache HTTP 客户端
+        BoringSSL
+        硬件标识符访问权
+        通知
+        音频管理器变更
+        支持文本选择
+        Android 密钥库不再支持 DSA。但仍支持 ECDSA
+        WLAN 和网络连接变更
+        相机服务变更
+        APK 验证
+        USB 连接
+    Android 7.0
+        电池和内存
+            低电耗模式
+            Project Svelte：后台优化
+        权限更改
+            系统权限更改
+        在应用间文件共享权限控制
+        多窗口支持
+        通知栏快捷回复
+        支持VR
+        引入JIT编译器
+        画中画
+        App快捷菜单
+    Android 7.1
+        加入重启按钮
+        App圆形图标
+        添加新的Emoji
