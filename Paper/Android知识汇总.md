@@ -14,6 +14,12 @@ Android提供了ContentResolver，外界的程序可以通过ContentResolver接�
 - **AbsoluteLayout(绝对布局):**用X,Y坐标来指定元素的位置，这种布局方式也比较简单，但是在屏幕旋转时，往往会出问题，而且多个元素的时候，计算比较麻烦。
 - **RelativeLayout(相对布局):**可以理解为某一个元素为参照物，来定位的布局方式。主要属性有：相对于某一个元素`android:layout_below`、`android:layout_toLeftOf`相对于父元素的地方`android:layout_alignParentLeft`、`android:layout_alignParentRigh`。
 - **TableLayout(表格布局):**每一个TableLayout里面有表格行TableRow，TableRow里面可以具体定义每一个元素。每一个布局都有自己适合的方式，这五个布局元素可以相互嵌套应用，做出美观的界面。
+###Activity根视图是什么###
+一、DecorView为整个Window界面的最顶层View。  
+二、DecorView只有一个子元素为LinearLayout。代表整个Window界面，包含通知栏，标题栏，内容显示栏三块区域。  
+三、LinearLayout里有两个FrameLayout子元素。  
+  - 标题栏显示界面。只有一个TextView显示应用的名称。也可以自定义标题栏，载入后的自定义标题栏View将加入FrameLayout中。  
+  - 内容栏显示界面。就是setContentView()方法载入的布局界面，加入其中。  
 ###Android抽象布局——include、merge 、ViewStub###
 在布局优化中，Android的官方提到了这三种布局`<include />`、`<merge />`、`<ViewStub />`，下面也是简单说一下他们的优势，以及怎么使用。  
 - **1、布局重用`<include />`**  
