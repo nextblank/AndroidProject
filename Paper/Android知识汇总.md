@@ -588,6 +588,11 @@ AIDL语法很简单,可以用来声明一个带一个或多个方法的接口，
 ###NDK是什么###
 NDK是一些列工具的集合，NDK提供了一系列的工具，帮助开发者迅速的开发C/C++的动态库，并能自动将so和java 应用打成apk包。  
 NDK集成了交叉编译器，并提供了相应的mk文件和隔离cpu、平台等的差异，开发人员只需简单的修改mk文件就可以创建出so。
+###Android如何查看应用签名信息###
+    KeyStore签名的应用
+        keytool -list -keystore XXXXX-debug.keystore
+    获取第三方的APK
+        keytool -printcert -file XXXXX-release.RSA
 ###Android源码和系统的架构###
 android系统架构采用了分层架构的思想，从上到下共4层，分别为：应用程序层、应用程序框架层、系统库和android运行时层、Linux内核层。  
 - **应用程序层（Java应用程序）：**
