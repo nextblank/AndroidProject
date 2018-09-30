@@ -34,6 +34,7 @@ public class SDKApplication extends Application {
             return;
         }
         LeakCanary.install(this);
+        //
     }
 
     public static SDKApplication getInstance() {
