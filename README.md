@@ -1,1 +1,1 @@
-SDK for Android Apps
+Project Android
