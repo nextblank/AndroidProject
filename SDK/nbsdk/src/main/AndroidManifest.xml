@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 
-    package="com.nextblank.sdk">
+    package="com.nextblank.android.sdk">
 
     <application
         android:name=".SDKApplication"
