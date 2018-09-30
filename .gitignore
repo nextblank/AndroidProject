@@ -43,7 +43,7 @@ captures/
 *.iml
 .idea/
 SDK/*.iml
-SDK/.idea/*
+SDK/.idea/
 
 # Keystore files
 *.jks
