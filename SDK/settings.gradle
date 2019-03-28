@@ -1,2 +1,2 @@
-include ':nbsdk'
-include ':sample'
+include ':libBase'
+include ':portal'
