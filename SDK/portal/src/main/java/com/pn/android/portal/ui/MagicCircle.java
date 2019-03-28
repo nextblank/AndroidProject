@@ -14,7 +14,6 @@ import android.view.animation.Transformation;
 public class MagicCircle extends View {
 
     private Path mPath;
-    
     private Paint mFillCirclePaint;
 
     /**
