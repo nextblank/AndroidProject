@@ -15,10 +15,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <com.pn.android.portal.ui.MagicCircle
+    <com.pn.android.portal.ui.CircleRectFooter
         android:id="@+id/circle3"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
